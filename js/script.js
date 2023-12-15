@@ -19,19 +19,70 @@ function gameboard() {
     
     let marksX = [];
     let marksO = [];
+    let gameIsOn = true;
 
     const addMark = function(player) {
-        let markPosition = prompt("Select your placement (0-8)");
-        if (player==="X") {
-            marksX.push(markPosition);
-            console.log(marksX);
+        let markPosition = null;
+        let inputPositon= prompt(`${gameControl.giveTurn()}: select your placement (0-8)`);
+        if (inputPositon===null) {
+            gameIsOn = false;
         } else {
-            marksO.push(markPosition);
-            console.log(marksO);
-        };
+            markPosition = Number(inputPositon);
+            if (checkExisting(markPosition)) {
+                if (player==="X") {
+                    marksX.push(markPosition);
+                    console.log(marksX);
+                } else {
+                    marksO.push(markPosition);
+                    console.log(marksO);
+                };
+            }
+        }
     }
 
-    return {gameboard, addMark};
+    function checkExisting(markPosition) {
+        if (marksX.includes(markPosition) || marksO.includes(markPosition)) {
+            console.log("This place is already taken");
+            gameControl.changeTurn();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    const checkBoard = function() {
+        console.log(`marksX: ${marksX}`);
+        console.log(`marksO: ${marksO}`);
+
+        for (const array of winningCombination) {
+            if (array.every(elem => marksX.includes(elem))) {
+                console.log('marksX wins');
+                gameIsOn = false;
+                return marksX;
+            } else if (array.every(elem => marksO.includes(elem))) {
+                console.log('marksO wins');
+                gameIsOn = false;
+                return marksO;
+            } else {
+                if ((marksX.length+marksO.length) === 9) {
+                    console.log('DRAW!');
+                    gameIsOn = false;
+                } else {
+                    console.log('No win yet');
+                }
+            }
+        }
+    }
+
+    const giveStatus = function() {
+        return gameIsOn;
+    }
+
+    const giveGameboard = function() {
+        return gameboard;
+    }
+
+    return {winningCombination, addMark, giveGameboard, checkBoard, giveStatus};
 }
 
 function player(mark) {
@@ -45,7 +96,7 @@ function player(mark) {
 }
 
 function play() {
-    let playerTurn = 'X';
+    let playerTurn = 'O';
 
     const changeTurn = function() {
         if (playerTurn==='X') {
@@ -56,12 +107,30 @@ function play() {
         return playerTurn;
         };
 
-    return {playerTurn, changeTurn};
+    const giveTurn = () => playerTurn;
+
+    return {playerTurn, giveTurn, changeTurn};
 }
 
+function controlsDom() {
+    const generateGrid = function() {
+        
+    }
+}
+
+let domController = controlsDom();
 let gameBoard = gameboard();
 let gameControl = play();
 let playerX = player('X');
 let playerO = player('O');
 
-gameBoard.addMark(play.PlayerTurn);
+const button = document.getElementById('launch');
+button.addEventListener('click', launchGame);
+
+function launchGame() {
+while (gameBoard.giveStatus()) {
+    gameControl.changeTurn();
+    gameBoard.addMark(gameControl.giveTurn());
+    gameBoard.checkBoard();
+}
+}
