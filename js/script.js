@@ -113,9 +113,22 @@ function play() {
 }
 
 function controlsDom() {
+    
     const generateGrid = function() {
-        
+        const container = document.getElementById("container");
+        const board = document.createElement('div');
+        board.setAttribute('id', 'board');
+        for (i=0; i<9; i++) {
+                const placeholderMark = document.createElement('button');
+                placeholderMark.setAttribute('data-placeholderMark', i);
+                placeholderMark.classList.add ('placeholderMark');
+                placeholderMark.setAttribute('type', 'button');
+                board.appendChild(placeholderMark);
+        }
+        container.appendChild(board);
     }
+    
+    return {generateGrid};
 }
 
 let domController = controlsDom();
@@ -128,7 +141,8 @@ const button = document.getElementById('launch');
 button.addEventListener('click', launchGame);
 
 function launchGame() {
-while (gameBoard.giveStatus()) {
+    domController.generateGrid();
+    while (gameBoard.giveStatus()) {
     gameControl.changeTurn();
     gameBoard.addMark(gameControl.giveTurn());
     gameBoard.checkBoard();

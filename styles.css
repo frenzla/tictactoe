@@ -10,3 +10,19 @@
     cursor: pointer;
     background-color: #008CBA;
   }
+
+  #board {
+    height: 300px;
+    width: 300px;
+    display: grid;
+    grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+    grid-gap: 1px;
+    background-color: darkblue;
+  }
+
+  .placeholderMark {
+    background-color: white;
+    color:black;
+    cursor: pointer;
+    border: none;
+  }
