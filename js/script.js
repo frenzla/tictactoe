@@ -26,11 +26,13 @@ function gameboard() {
         if (checkExisting(markPosition)) {
             if (player==="X") {
                 marksX.push(markPosition);
-                console.log(marksX);
                 domController.showMark(placeholder, player);
+                const button = document.querySelector(`[data-placeholderMark="${placeholder}"]`);
+                button.disabled = true;
             } else {
                 marksO.push(markPosition);
-                console.log(marksO);
+                const button = document.querySelector(`[data-placeholderMark="${placeholder}"]`);
+                button.disabled = true;
                 domController.showMark(placeholder, player);
             };
         }
@@ -47,23 +49,22 @@ function gameboard() {
     }
 
     const checkBoard = function() {
-        console.log(`marksX: ${marksX}`);
-        console.log(`marksO: ${marksO}`);
         const turns = marksX.length+marksO.length;
         for (const array of winningCombination) {
             if (array.every(elem => marksX.includes(elem))) {
-                console.log('marksX wins');
+                const result = document.getElementById('result');
+                result.textContent = 'X wins!!! Well Done!';
                 gameIsOn = false;
                 return marksX;
             } else if (array.every(elem => marksO.includes(elem))) {
-                console.log('marksO wins');
+                const result = document.getElementById('result');
+                result.textContent = 'O wins!!! Well Done!';
                 gameIsOn = false;
                 return marksO;
             } else if ((turns) === 9) {
-                console.log('DRAW!');
+                const result = document.getElementById('result');
+                result.textContent = "It's a draw!";
                 gameIsOn = false;
-            } else {
-                console.log('No win yet');
             }
         }
     }
@@ -76,7 +77,21 @@ function gameboard() {
         return gameboard;
     }
 
-    return {winningCombination, addMark, giveGameboard, checkBoard, giveStatus};
+    const resetGame = function() {
+        marksX = [];
+        marksO = [];
+        gameIsOn = true;
+        const result = document.getElementById('result');
+        result.textContent = "";
+        const slots = document.querySelectorAll("#board > button");
+        slots.forEach((slot) => {
+            slot.textContent = '';
+            slot.disabled = false;
+        });
+
+    };
+
+    return {winningCombination, resetGame, addMark, giveGameboard, checkBoard, giveStatus};
 }
 
 /* function player(mark) {
@@ -138,8 +153,14 @@ let playerO = player('O'); */
 
 const button = document.getElementById('launch');
 button.addEventListener('click', launchGame);
+const resetButton = document.getElementById('reset');
+resetButton.addEventListener('click', ()=>{
+    gameBoard.resetGame();
+});
 
 function launchGame() {
+    button.style.display = 'none';
+    resetButton.style.display = 'block';
     domController.generateGrid();
     const slots = document.querySelectorAll("#board > button");
     slots.forEach((slot) => {

@@ -1,3 +1,22 @@
+h1, h3 {
+  text-align: center;
+}
+
+#container {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+}
+
+#launch, #reset {
+  margin: auto;
+}
+
+#reset {
+  display: none;
+}
+
 .button {
     border: none;
     color: white;
@@ -9,6 +28,11 @@
     margin: 4px 2px;
     cursor: pointer;
     background-color: #008CBA;
+  }
+
+  button:disabled {
+    background-color: #cccccc;
+    cursor: default;
   }
 
   #board {
