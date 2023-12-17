@@ -21,24 +21,20 @@ function gameboard() {
     let marksO = [];
     let gameIsOn = true;
 
-    const addMark = function(player) {
-        let markPosition = null;
-        let inputPositon= prompt(`${gameControl.giveTurn()}: select your placement (0-8)`);
-        if (inputPositon===null) {
-            gameIsOn = false;
-        } else {
-            markPosition = Number(inputPositon);
-            if (checkExisting(markPosition)) {
-                if (player==="X") {
-                    marksX.push(markPosition);
-                    console.log(marksX);
-                } else {
-                    marksO.push(markPosition);
-                    console.log(marksO);
-                };
-            }
+    const addMark = function(player, placeholder) {
+        const markPosition = Number(placeholder);
+        if (checkExisting(markPosition)) {
+            if (player==="X") {
+                marksX.push(markPosition);
+                console.log(marksX);
+                domController.showMark(placeholder, player);
+            } else {
+                marksO.push(markPosition);
+                console.log(marksO);
+                domController.showMark(placeholder, player);
+            };
         }
-    }
+    };
 
     function checkExisting(markPosition) {
         if (marksX.includes(markPosition) || marksO.includes(markPosition)) {
@@ -53,7 +49,7 @@ function gameboard() {
     const checkBoard = function() {
         console.log(`marksX: ${marksX}`);
         console.log(`marksO: ${marksO}`);
-
+        const turns = marksX.length+marksO.length;
         for (const array of winningCombination) {
             if (array.every(elem => marksX.includes(elem))) {
                 console.log('marksX wins');
@@ -63,13 +59,11 @@ function gameboard() {
                 console.log('marksO wins');
                 gameIsOn = false;
                 return marksO;
+            } else if ((turns) === 9) {
+                console.log('DRAW!');
+                gameIsOn = false;
             } else {
-                if ((marksX.length+marksO.length) === 9) {
-                    console.log('DRAW!');
-                    gameIsOn = false;
-                } else {
-                    console.log('No win yet');
-                }
+                console.log('No win yet');
             }
         }
     }
@@ -85,7 +79,7 @@ function gameboard() {
     return {winningCombination, addMark, giveGameboard, checkBoard, giveStatus};
 }
 
-function player(mark) {
+/* function player(mark) {
     let points = 0;
     
     const increasePoints = () => points++;
@@ -93,7 +87,7 @@ function player(mark) {
     const tellPoints = () => points;
 
     return {mark, increasePoints, tellPoints};
-}
+} */
 
 function play() {
     let playerTurn = 'O';
@@ -127,24 +121,35 @@ function controlsDom() {
         }
         container.appendChild(board);
     }
-    
-    return {generateGrid};
+
+    const showMark = function(slot, player) {
+        const button = document.querySelector(`[data-placeholderMark="${slot}"]`);
+        button.textContent = player;
+    }
+
+    return {generateGrid, showMark};
 }
 
 let domController = controlsDom();
 let gameBoard = gameboard();
 let gameControl = play();
-let playerX = player('X');
-let playerO = player('O');
+/* let playerX = player('X');
+let playerO = player('O'); */
 
 const button = document.getElementById('launch');
 button.addEventListener('click', launchGame);
 
 function launchGame() {
     domController.generateGrid();
-    while (gameBoard.giveStatus()) {
-    gameControl.changeTurn();
-    gameBoard.addMark(gameControl.giveTurn());
-    gameBoard.checkBoard();
-}
+    const slots = document.querySelectorAll("#board > button");
+    slots.forEach((slot) => {
+        slot.addEventListener('click', function(e) {
+            let placeholder = e.target.getAttribute('data-placeholderMark');
+            if (gameBoard.giveStatus()) {
+                gameControl.changeTurn();
+                gameBoard.addMark(gameControl.giveTurn(), placeholder);
+                gameBoard.checkBoard();
+            };
+        });
+    });
 }
